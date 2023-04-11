@@ -2,7 +2,9 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"gorm.io/gorm"
 	"time"
 
 	"github.com/kingwel-xie/k2/core/logger"
@@ -43,7 +45,11 @@ func (l gormLogger) Trace(ctx context.Context, begin time.Time, fc func() (strin
 	switch {
 	case err != nil:
 		sql, rows := fc()
-		log.Errorf("SQL: %v, elapsed=%f, %s, rows=%d", err, float64(elapsed.Nanoseconds())/1e6, sql, rows)
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			log.Warnf("SQL: %v, elapsed=%f, %s, rows=%d", err, float64(elapsed.Nanoseconds())/1e6, sql, rows)
+		} else {
+			log.Errorf("SQL: %v, elapsed=%f, %s, rows=%d", err, float64(elapsed.Nanoseconds())/1e6, sql, rows)
+		}
 
 	case elapsed > l.SlowThreshold && l.SlowThreshold != 0:
 		sql, rows := fc()
