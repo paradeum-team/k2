@@ -59,7 +59,7 @@ func (e {{.ClassName}}) GetPage(c *gin.Context) {
 // @Summary 获取{{.TableComment}}
 // @Description 获取{{.TableComment}}
 // @Tags {{.TableComment}}
-// @Param {{.PkJsonField}} path string false "{{.PkComment}}"
+// @Param {{.PkJsonField}} path string true "{{.PkComment}}"
 // @Success 200 {object} response.Response{data=models.{{.ClassName}}} "{"code": 200, "data": [...]}"
 // @Router /api/v1/{{.ModuleName}}/{ {{- .PkJsonField -}} } [get]
 // @Security Bearer

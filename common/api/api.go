@@ -81,7 +81,17 @@ func (e *Api) GetIdentity() *service.AuthIdentity {
 
 // Error 通常错误数据处理
 func (e Api) Error(err error) {
-	e.Logger.Errorf("ApiError: %v", err)
+	er, ok := err.(bizError)
+	if !ok {
+		er = cerr.ErrInternal.Wrap(err)
+	}
+
+	if er.Code() == 500 {
+		e.Logger.Errorf("ApiError: %v", err)
+	} else {
+		e.Logger.Warnf("ApiError: %v", err)
+	}
+
 	response.Error(e.Context, err)
 }
 
@@ -128,4 +138,9 @@ func MustGetOrm(c *gin.Context) *gorm.DB {
 	default:
 		panic("WTF, bad db??")
 	}
+}
+
+type bizError interface {
+	Code() int
+	Message(mode string, lang string) string
 }
